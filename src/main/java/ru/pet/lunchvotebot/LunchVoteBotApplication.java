@@ -13,10 +13,11 @@ public class LunchVoteBotApplication {
 
     public static void main(String[] args) {
         try {
+            log.info("Starting app");
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
             botsApi.registerBot(new LunchVoteBot(getenv.get("BOT_NAME"), getenv.get("BOT_TOKEN")));
         } catch (TelegramApiException e){
-            log.debug("Telegram exception");
+            log.error("Telegram exception");
         }
     }
 }
