@@ -1,5 +1,6 @@
 package ru.pet.lunchvotebot;
 
+import org.apache.log4j.Logger;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.IBotCommand;
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -9,6 +10,7 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 abstract class ServiceCommand extends BotCommand implements IBotCommand{
+    Logger log = Logger.getLogger(ServiceCommand.class);
     ServiceCommand(String identifier, String description) {
         this.setCommand(identifier);
         this.setDescription(description);
@@ -24,10 +26,11 @@ abstract class ServiceCommand extends BotCommand implements IBotCommand{
         message.enableMarkdown(true);
         message.setChatId(chatId.toString());
         message.setText(text);
+        log.info("Try to send answer on " + commandName + " command");
         try {
             absSender.execute(message);
         } catch (TelegramApiException e){
-
+            log.info("Error sending reply in " + commandName + " command");
         }
     }
 
