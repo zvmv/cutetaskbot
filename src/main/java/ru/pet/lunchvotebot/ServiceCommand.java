@@ -10,7 +10,13 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 abstract class ServiceCommand extends BotCommand implements IBotCommand{
     ServiceCommand(String identifier, String description) {
-        super(identifier, description);
+        this.setCommand(identifier);
+        this.setDescription(description);
+    }
+
+    @Override
+    public String getCommandIdentifier() {
+        return this.getCommand();
     }
 
     void sendAnswer(AbsSender absSender, Long chatId, String commandName, String userName, String text){

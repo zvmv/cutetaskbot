@@ -11,11 +11,6 @@ public class StartCommand extends ServiceCommand {
     }
 
     @Override
-    public String getCommandIdentifier() {
-        return null;
-    }
-
-    @Override
     public void processMessage(AbsSender absSender, Message message, String[] strings) {
         User user = message.getFrom();
         String userName = (user.getUserName() != null) ? user.getUserName()
