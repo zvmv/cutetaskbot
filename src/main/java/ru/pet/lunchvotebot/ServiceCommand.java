@@ -23,7 +23,7 @@ abstract class ServiceCommand extends BotCommand implements IBotCommand{
 
     void sendAnswer(AbsSender absSender, Long chatId, String commandName, String userName, String text){
         SendMessage message = new SendMessage();
-        message.enableMarkdown(true);
+        message.enableMarkdown(false);
         message.setChatId(chatId.toString());
         message.setText(text);
         log.info("Try to send answer on " + commandName + " command");
