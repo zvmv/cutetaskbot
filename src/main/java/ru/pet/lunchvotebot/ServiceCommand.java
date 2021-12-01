@@ -32,6 +32,7 @@ abstract class ServiceCommand extends BotCommand implements IBotCommand{
         } catch (TelegramApiException e){
             log.info("Error sending reply in " + commandName + " command");
             log.info(e.getMessage());
+            log.info("bad message: " + message.getText());
         }
     }
 
