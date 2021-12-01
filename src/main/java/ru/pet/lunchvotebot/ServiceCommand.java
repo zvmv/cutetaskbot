@@ -13,7 +13,6 @@ abstract class ServiceCommand extends BotCommand implements IBotCommand{
         super(identifier, description);
     }
 
-
     void sendAnswer(AbsSender absSender, Long chatId, String commandName, String userName, String text){
         SendMessage message = new SendMessage();
         message.enableMarkdown(true);
@@ -26,13 +25,4 @@ abstract class ServiceCommand extends BotCommand implements IBotCommand{
         }
     }
 
-    @Override
-    public String getCommandIdentifier() {
-        return "start";
-    }
-
-    @Override
-    public void processMessage(AbsSender absSender, Message message, String[] strings) {
-
-    }
 }
