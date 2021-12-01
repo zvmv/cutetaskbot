@@ -14,7 +14,11 @@ public class StartCommand extends ServiceCommand {
 
     @Override
     public void processMessage(AbsSender absSender, Message message, String[] strings) {
+<<<<<<< HEAD
         log.info("Enter StartCommand processMessage");
+=======
+        log.debug("Enter StartCommand processMessage");
+>>>>>>> be2fa6306c7deb15c9d1b0269fa4bb2a6811f43f
         User user = message.getFrom();
         String userName = (user.getUserName() != null) ? user.getUserName()
                 : String.format("%s %s", user.getFirstName(), user.getLastName());
