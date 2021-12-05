@@ -1,0 +1,23 @@
+bot:
+  name: ${BOT_NAME}
+  token: ${BOT_TOKEN}
+  perf_id: ${BOT_PERF_ID}
+
+spring:
+  #DATABASE
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:lunchvotebot
+    username: sa
+    password: password
+  jpa:
+    #HIBERNATE
+    show-sql: true
+    hibernate.ddl-auto: update
+    properties.hibernate:
+      dialect: org.hibernate.dialect.H2Dialect
+      format_sql: true
+      use_sql_comments: false
+      hbm2ddl.auto: create
+      hbm2ddl.import_files: import.sql
+      hbm2ddl.import_files_sql_extractor: org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor

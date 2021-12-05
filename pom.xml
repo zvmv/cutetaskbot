@@ -3,15 +3,22 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>ru.pet</groupId>
-    <artifactId>LunchVoteBot</artifactId>
+    <artifactId>CuteTaskBot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>LunchVoteBot</name>
-    <description>Telegram bot for LunchVote application</description>
+    <name>CuteTaskBot</name>
+    <description>Telegram bot for creating tasks</description>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.5.2</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <packaging>jar</packaging>
     <properties>
-        <java.version>11</java.version>
+        <java.version>15</java.version>
         <lombok.version>1.18.20</lombok.version>
-        <telegram.version>5.4.0.1</telegram.version>
         <slf4j.version>1.7.32</slf4j.version>
+        <telegram.version>5.4.0.1</telegram.version>
     </properties>
     <dependencies>
         <dependency>
@@ -26,24 +33,22 @@
             <version>${telegram.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.telegram</groupId>
-            <artifactId>telegrambotsextensions</artifactId>
-            <version>${telegram.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <version>2.5.2</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j.version}</version>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
@@ -55,6 +60,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>

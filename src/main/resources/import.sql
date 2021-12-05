@@ -1,0 +1,2 @@
+-- INSERT INTO botuser (id, name, admin, state)
+-- VALUES (178448882, 'admin', true, 'registered');
