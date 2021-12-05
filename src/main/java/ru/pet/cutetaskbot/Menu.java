@@ -76,9 +76,9 @@ public class Menu {
     void taskList(Update update, Long userId, Long chatId, boolean finished){
         List<Task> tasks = null;
         if (userId == util.PERF_ID) {
-            tasks = taskRepo.findAllByCreatedByIdAndFinished(userId, finished);
-        } else {
             tasks = taskRepo.findAllByFinished(finished);
+        } else {
+            tasks = taskRepo.findAllByCreatedByIdAndFinished(userId, finished);
         };
         String reply = "";
         log.info("User " + userId + " entered taskList state");
