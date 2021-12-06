@@ -45,5 +45,6 @@ public class BotUser {
         this.setId(id);
         this.name = userName;
         this.performer = false;
+        this.isAdmin = false;
     }
 }
