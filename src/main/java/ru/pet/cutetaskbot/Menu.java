@@ -74,14 +74,16 @@ public class Menu {
     }
 
     void taskList(Update update, Long userId, Long chatId, boolean finished){
+        log.info("User " + userId + " entered taskList state");
         List<Task> tasks = null;
-        if (userId == util.PERF_ID) {
+        if (userId.equals(util.PERF_ID)) {
             tasks = taskRepo.findAllByFinished(finished);
+            log.info("User get ALL tasks");
         } else {
             tasks = taskRepo.findAllByCreatedByIdAndFinished(userId, finished);
+            log.info("User get his tasks");
         };
         String reply = "";
-        log.info("User " + userId + " entered taskList state");
         if (tasks.isEmpty()) {
             reply = "Список " + (finished ? "завершённых" : "активных") + " задач пуст";
             util.setUserState(update.getCallbackQuery().getFrom().getId(), "mainMenu");
