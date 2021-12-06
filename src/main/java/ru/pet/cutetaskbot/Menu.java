@@ -44,6 +44,7 @@ public class Menu {
         log.info("User " + userId + " entered inputUserContacts state");
         BotUser user = repo.findById(userId).get();
         user.setState("mainMenu");
+        user.setName(update.getMessage().getText());
         repo.save(user);
         util.sendAnswer(chatId, reply);
 
