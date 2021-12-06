@@ -41,7 +41,8 @@ public class BotUser {
     public BotUser(){
         this.performer = false;
         this.isAdmin = false;
-        this.state = "unregistered";
+        this.state = "changeContactsMenu";
+        this.name = "unnamed";
     }
 
     public BotUser(Long id, String userName) {
