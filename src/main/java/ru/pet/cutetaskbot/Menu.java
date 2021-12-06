@@ -42,7 +42,7 @@ public class Menu {
     void inputUserContacts(Update update, Long userId, Long chatId){
         String reply = "Информация сохранена";
         log.info("User " + userId + " entered inputUserContacts state");
-        BotUser user = new BotUser(userId, update.getMessage().getText());
+        BotUser user = repo.findById(userId).get();
         user.setState("mainMenu");
         repo.save(user);
         util.sendAnswer(chatId, reply);
