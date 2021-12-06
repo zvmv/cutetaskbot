@@ -36,7 +36,7 @@ public class Menu {
         String reply = "Введите своё ФИО и контактную информацию!";
         log.info("User " + userId + " entered changeContactsMenu");
         util.sendAnswer(update, chatId, reply, null);
-        util.setUserState(userId, "inputUserContacts");
+        util.setUserState(userId, chatId, "inputUserContacts");
     }
 
     void inputUserContacts(Update update, Long userId, Long chatId){

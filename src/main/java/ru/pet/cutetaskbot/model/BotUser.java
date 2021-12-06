@@ -39,6 +39,9 @@ public class BotUser {
     private Long chatId;
 
     public BotUser(){
+        this.performer = false;
+        this.isAdmin = false;
+        this.state = "unregistered";
     }
 
     public BotUser(Long id, String userName) {
