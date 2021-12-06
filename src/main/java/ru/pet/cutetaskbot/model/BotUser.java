@@ -2,6 +2,7 @@ package ru.pet.cutetaskbot.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.checkerframework.checker.compilermsgs.qual.CompilerMessageKey;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,18 +15,27 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "botuser")
 public class BotUser {
-    @Column
     @Id
+    @Column(name = "id")
     private Long id;
-    @Column
+
+    @Column(name = "name")
     private String name;
-    @Column
+
     @NotNull
+    @Column(name = "performer")
     private Boolean performer;
 
     @NotNull
-    private String state;
+    @Column(name = "isadmin")
+    private Boolean isAdmin;
+
     @NotNull
+    @Column(name = "state")
+    private String state;
+
+    @NotNull
+    @Column(name = "chatid")
     private Long chatId;
 
     public BotUser(){

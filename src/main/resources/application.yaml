@@ -3,21 +3,28 @@ bot:
   token: ${BOT_TOKEN}
   perf_id: ${BOT_PERF_ID}
 
+base:
+  url: ${DATABASE_URL}
+
+
+
 spring:
   #DATABASE
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:lunchvotebot
-    username: sa
-    password: password
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:${base.url}
+  #  driver-class-name: org.h2.Driver
+#    username: sa
+#    password: password
   jpa:
     #HIBERNATE
     show-sql: true
-    hibernate.ddl-auto: update
+#    hibernate.ddl-auto: update
     properties.hibernate:
-      dialect: org.hibernate.dialect.H2Dialect
+#      dialect: org.hibernate.dialect.H2Dialect
+      dialect: org.hibernate.dialect.PostgreSQLDialect
       format_sql: true
       use_sql_comments: false
-      hbm2ddl.auto: create
-      hbm2ddl.import_files: import.sql
-      hbm2ddl.import_files_sql_extractor: org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor
+#      hbm2ddl.auto: create
+#      hbm2ddl.import_files: import.sql
+#      hbm2ddl.import_files_sql_extractor: org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor
