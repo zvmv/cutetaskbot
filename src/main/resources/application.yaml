@@ -1,7 +1,7 @@
 bot:
   name: ${BOT_NAME}
   token: ${BOT_TOKEN}
-  perf_id: ${BOT_PERF_ID}
+  admin_id: ${BOT_ADMIN_ID}
 
 base:
   url: ${DATABASE_URL}

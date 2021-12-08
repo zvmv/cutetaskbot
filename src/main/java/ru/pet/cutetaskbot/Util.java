@@ -19,8 +19,8 @@ import java.time.LocalDate;
 
 @Component
 public class Util {
-    @Value("${bot.perf_id}")
-    public Long PERF_ID;
+    @Value("${bot.admin_id}")
+    public Long ADMIN_ID;
 
     private final BotUserRepository repo;
 
