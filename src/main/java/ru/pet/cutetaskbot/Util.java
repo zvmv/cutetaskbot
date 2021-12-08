@@ -16,6 +16,7 @@ import ru.pet.cutetaskbot.model.BotUser;
 import ru.pet.cutetaskbot.repository.BotUserRepository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Component
 public class Util {
@@ -32,6 +33,20 @@ public class Util {
     @Autowired
     public Util(BotUserRepository repo) {
         this.repo = repo;
+    }
+
+    public Boolean isPerformer(Long userId){
+        BotUser user = repo.findById(userId).orElse(null);
+        return user != null && user.getPerformer();
+    }
+
+    public Boolean isAdmin(Long userId){
+        BotUser user = repo.findById(userId).orElse(null);
+        return user != null && user.getAdmin();
+    }
+
+    public List<BotUser> getPerformers(){
+        return repo.findAllByPerformer(true);
     }
 
     public String getUserState(Long userId){
@@ -81,7 +96,7 @@ public class Util {
             sendMessage.setChatId(chatId.toString());
             if (text != null) sendMessage.setText(text);
             if (markup != null) sendMessage.setReplyMarkup(markup);
-        };
+        }
         try {
             log.info("Sending message " + text + ((markup != null) ? " with markup..." : "..."));
             if (editMessage!= null) sender.execute(editMessage);
@@ -116,7 +131,11 @@ public class Util {
         repo.findById(userId).ifPresent(user -> sendAnswer(user.getChatId(), text));
     }
 
-    public static String stripDate(LocalDate date){
+    public void notifyPerformers(String text){
+        repo.findAllByPerformer(true).forEach(user -> sendAnswer(user.getChatId(), text));
+    }
+
+    public static String stripDate(LocalDate date) {
         String[] weekDay = {"Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"};
 
         LocalDate now = LocalDate.now();
@@ -124,7 +143,7 @@ public class Util {
         if (now.equals(date)) return "Сегодня";
         if (now.toEpochDay() - date.toEpochDay() == 1) return "Вчера";
         if (date.isBefore(now) && date.plusDays(7).isAfter(now))
-            if (date.getDayOfWeek().getValue() <= now.getDayOfWeek().getValue()){
+            if (date.getDayOfWeek().getValue() <= now.getDayOfWeek().getValue()) {
                 return weekDay[date.getDayOfWeek().getValue()];
             }
         String result = "";
@@ -133,7 +152,6 @@ public class Util {
             result += "." + date.getYear();
         return result;
     }
-
 
     public static void main(String[] args) {
         System.out.println(stripDate(LocalDate.now()));
