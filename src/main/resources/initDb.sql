@@ -2,8 +2,11 @@ drop table botuser;
 create table botuser (
     id integer,
     name varchar,
+    username varchar,
+    firstname varchar,
+    lastname varchar,
     performer bool,
-    isadmin bool,
+    admin bool,
     state varchar,
     chatid integer,
     primary key(id)

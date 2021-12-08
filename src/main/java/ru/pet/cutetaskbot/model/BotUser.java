@@ -2,7 +2,6 @@ package ru.pet.cutetaskbot.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.checkerframework.checker.compilermsgs.qual.CompilerMessageKey;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,13 +21,23 @@ public class BotUser {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "username")
+    private String userName;
+
+    @Column(name = "lastname")
+    private String lastName;
+
+    @Column(name = "firstname")
+    private String firstName;
+
+
     @NotNull
     @Column(name = "performer")
     private Boolean performer;
 
     @NotNull
-    @Column(name = "isadmin")
-    private Boolean isAdmin;
+    @Column(name = "admin")
+    private Boolean admin;
 
     @NotNull
     @Column(name = "state")
@@ -40,7 +49,7 @@ public class BotUser {
 
     public BotUser(){
         this.performer = false;
-        this.isAdmin = false;
+        this.admin = false;
         this.state = "changeContactsMenu";
         this.name = "unnamed";
     }
@@ -49,6 +58,6 @@ public class BotUser {
         this.setId(id);
         this.name = userName;
         this.performer = false;
-        this.isAdmin = false;
+        this.admin = false;
     }
 }
