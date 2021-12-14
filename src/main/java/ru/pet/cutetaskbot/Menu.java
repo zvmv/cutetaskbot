@@ -234,7 +234,7 @@ public class Menu {
                         .callbackData("userListPerformers").build(),
                 InlineKeyboardButton.builder().text("Все")
                         .callbackData("userListAll").build()));
-        userBtns.add(List.of(InlineKeyboardButton.builder().text("Создать инвайт").callbackData("createInvite").build()));
+        userBtns.add(List.of(InlineKeyboardButton.builder().text("Создать инвайт").callbackData("newInvite").build()));
         userBtns.add(List.of(InlineKeyboardButton.builder().text("Вернуться в главное меню").callbackData("mainMenu").build()));
 
         InlineKeyboardMarkup markup = InlineKeyboardMarkup.builder().keyboard(userBtns).build();
@@ -319,5 +319,12 @@ public class Menu {
 //        util.deleteMessageMarkup(update.getCallbackQuery().getMessage().getMessageId(), chatId);
 //        util.sendAnswer(chatId, reply);
         userDetails(update, userId, chatId);
+    }
+
+    void newInvite(Update update, Long userId, Long chatId){
+        log.info("User " + userId + " entered createInvite");
+        util.deleteMessage(update.getCallbackQuery().getMessage().getMessageId(), chatId);
+        util.sendAnswer(chatId, util.createInvite());
+        userListAll(null, userId, chatId);
     }
 }

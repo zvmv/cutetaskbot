@@ -16,12 +16,18 @@ import ru.pet.cutetaskbot.model.BotUser;
 import ru.pet.cutetaskbot.repository.BotUserRepository;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class Util {
     @Value("${bot.admin_id}")
     public Long ADMIN_ID;
+
+    private Map<Integer, LocalDate> invites = new HashMap<>();
+
+    private final int INVITE_EXPIRE_DAYS = 7;
 
     private final BotUserRepository repo;
 
@@ -133,6 +139,16 @@ public class Util {
 
     public void notifyPerformers(String text){
         repo.findAllByPerformer(true).forEach(user -> sendAnswer(user.getChatId(), text));
+    }
+
+    public String createInvite(){
+        Integer num = (int)(Math.random() * Integer.MAX_VALUE);
+        invites.put(num, LocalDate.now());
+        return "https://t.me/" + sender.getBotUsername() + "?start=" + num;
+    }
+
+    public Boolean checkInvite(Integer invite){
+        return invites.containsKey(invite) && invites.remove(invite).plusDays(INVITE_EXPIRE_DAYS).isAfter(LocalDate.now());
     }
 
     public static String stripDate(LocalDate date) {
