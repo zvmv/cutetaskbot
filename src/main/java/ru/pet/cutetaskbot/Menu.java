@@ -35,7 +35,7 @@ public class Menu {
 
     void changeContactsMenu(Update update, Long userId, Long chatId){
         log.info("User " + userId + " entered changeContactsMenu");
-        String reply = "Введите своё ФИО и контактную информацию!";
+        String reply = "Ваш ID " + userId + "Введите своё ФИО и контактную информацию!";
         util.setUserState(userId, chatId, "inputUserContacts");
         util.sendAnswer(update, chatId, reply, null);
     }
@@ -108,12 +108,14 @@ public class Menu {
                     taskId + ": " + Util.stripDate(t.getCreateDate()) + " - " + t.getDescription() + "\n").callbackData("taskDetails_" + taskId).build()));
         };
         if (finished) {
-            taskBtns.add(List.of(InlineKeyboardButton.builder().text("Показать незавершённые").callbackData("taskListNotFinished").build()));
+            taskBtns.add(List.of(InlineKeyboardButton.builder().text("Незавершённые").callbackData("taskListNotFinished").build(),
+                    InlineKeyboardButton.builder().text("Добавить задачу").callbackData("taskAddMenu").build()));
+            taskBtns.add(List.of(InlineKeyboardButton.builder().text("Очистить завершённые").callbackData("taskDeleteAllFinished").build()));
         } else {
-            taskBtns.add(List.of(InlineKeyboardButton.builder().text("Показать завершённые").callbackData("taskListFinished").build()));
+            taskBtns.add(List.of(InlineKeyboardButton.builder().text("Завершённые").callbackData("taskListFinished").build(),
+                    InlineKeyboardButton.builder().text("Добавить задачу").callbackData("taskAddMenu").build()));
         };
 
-        taskBtns.add(List.of(InlineKeyboardButton.builder().text("Добавить задачу").callbackData("taskAddMenu").build()));
         taskBtns.add(List.of(InlineKeyboardButton.builder().text("Вернуться в главное меню").callbackData("mainMenu").build()));
 
         InlineKeyboardMarkup markup = InlineKeyboardMarkup.builder().keyboard(taskBtns).build();
@@ -174,6 +176,15 @@ public class Menu {
         taskListNotFinished(null, userId, chatId);
     }
 
+    void taskDeleteAllFinished(Update update, Long userId, Long chatId){
+        log.info("User " + userId + " entered taskDeleteAllFinished");
+        String reply = "Завершённые задачи удалены";
+        taskRepo.deleteAllByCreatedByIdAndFinished(userId, true);
+        util.deleteMessageMarkup(update.getCallbackQuery().getMessage().getMessageId(), chatId);
+        util.sendAnswer(chatId, reply);
+        taskListNotFinished(null, userId, chatId);
+    }
+
     void taskResume(Update update, Long userId, Long chatId){
         taskSetFinish(update, userId, chatId, false);
     }
@@ -215,7 +226,7 @@ public class Menu {
 
     public void userList(Update update, Long userId, Long chatId, List<BotUser> users){
         log.info("User " + userId + " entered userList state");
-        String reply = "UserId = " + userId;
+        String reply = "Список пользователей (ваш id=" + userId + ")";
         List<List<InlineKeyboardButton>> userBtns = new ArrayList<>();
 
         for (BotUser u : users){
@@ -292,12 +303,9 @@ public class Menu {
     void userPerformer(Update update, Long userId, Long chatId, boolean performer){
         log.info("User " + userId + " entered userPerformer");
         Long uId = Long.parseLong(update.getCallbackQuery().getData().split("_")[1]);
-//        String reply = "Пользователь " + uId + (performer? " теперь исполнитель" : " теперь не исполнитель");
         BotUser user = repo.findById(uId).get();
         user.setPerformer(performer);
         repo.save(user);
-//        util.deleteMessageMarkup(update.getCallbackQuery().getMessage().getMessageId(), chatId);
-//        util.sendAnswer(chatId, reply);
         userDetails(update, userId, chatId);
     }
 
@@ -312,12 +320,9 @@ public class Menu {
     void userAdmin(Update update, Long userId, Long chatId, boolean admin){
         log.info("User " + userId + " entered userAdmin");
         Long uId = Long.parseLong(update.getCallbackQuery().getData().split("_")[1]);
-//        String reply = "Пользователь " + uId + (admin ? " теперь администратор" : " теперь не администратор");
         BotUser user = repo.findById(uId).get();
         user.setAdmin(admin);
         repo.save(user);
-//        util.deleteMessageMarkup(update.getCallbackQuery().getMessage().getMessageId(), chatId);
-//        util.sendAnswer(chatId, reply);
         userDetails(update, userId, chatId);
     }
 
