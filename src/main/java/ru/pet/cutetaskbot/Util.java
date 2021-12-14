@@ -59,7 +59,8 @@ public class Util {
         log.debug("Get user " + userId + " state");
         BotUser user = repo.findById(userId).orElse(null);
         if (user != null) return user.getState();
-        return "changeContactsMenu";
+        if (ADMIN_ID.equals(userId)) return "changeContactsMenu";
+        return "userNotFound";
     }
 
     public void setUserState(Long userId, String state){

@@ -33,9 +33,23 @@ public class Menu {
         this.taskRepo = taskRepo;
     }
 
+    void notAuthorized(Update update, Long userId, Long chatId){
+       util.sendAnswer(chatId, "Для использования сервиса нужно получить приглашение");
+    }
+
+    void userNotFound(Update update, Long userId, Long chatId){
+        log.info("User " + userId + " entered userNotFound");
+        String[] split = update.getMessage().getText().split(" ");
+        if (split.length == 2) {
+            String invite = update.getMessage().getText().split(" ")[1];
+            if (util.checkInvite(Integer.parseInt(invite))) changeContactsMenu(update, userId, chatId);
+        } else notAuthorized(update, userId, chatId);
+    }
+
     void changeContactsMenu(Update update, Long userId, Long chatId){
         log.info("User " + userId + " entered changeContactsMenu");
-        String reply = "Ваш ID " + userId + "Введите своё ФИО и контактную информацию!";
+
+        String reply = /*"Ваш ID " + userId + */"Введите своё ФИО и контактную информацию!";
         util.setUserState(userId, chatId, "inputUserContacts");
         util.sendAnswer(update, chatId, reply, null);
     }
