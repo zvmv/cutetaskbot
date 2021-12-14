@@ -179,7 +179,8 @@ public class Menu {
     void taskDeleteAllFinished(Update update, Long userId, Long chatId){
         log.info("User " + userId + " entered taskDeleteAllFinished");
         String reply = "Завершённые задачи удалены";
-        taskRepo.deleteAllByCreatedByIdAndFinished(userId, true);
+        if (util.isAdmin(userId)) taskRepo.deleteAllByFinished(true);
+        else taskRepo.deleteAllByCreatedByIdAndFinished(userId, true);
         util.deleteMessageMarkup(update.getCallbackQuery().getMessage().getMessageId(), chatId);
         util.sendAnswer(chatId, reply);
         taskListNotFinished(null, userId, chatId);
