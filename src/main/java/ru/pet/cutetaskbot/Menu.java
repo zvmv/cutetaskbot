@@ -34,7 +34,8 @@ public class Menu {
     }
 
     void notAuthorized(Update update, Long userId, Long chatId){
-       util.sendAnswer(chatId, "Для использования сервиса нужно получить приглашение");
+        log.info("User " + userId + " entered notAuthorized");
+        util.sendAnswer(chatId, "Для использования сервиса нужно получить приглашение");
     }
 
     void userNotFound(Update update, Long userId, Long chatId){
@@ -60,12 +61,11 @@ public class Menu {
         BotUser user = repo.findById(userId).get();
         user.setState("mainMenu");
         user.setName(update.getMessage().getText());
-        User tUser = update.getMessage().getFrom();
-        user.setUserName(tUser.getUserName());
-        user.setFirstName(tUser.getFirstName());
-        user.setLastName(tUser.getLastName());
-        if (userId.equals(util.ADMIN_ID))
-            user.setAdmin(true);
+        User telegramUser = update.getMessage().getFrom();
+        user.setUserName(telegramUser.getUserName());
+        user.setFirstName(telegramUser.getFirstName());
+        user.setLastName(telegramUser.getLastName());
+        if (userId.equals(util.ADMIN_ID)) user.setAdmin(true);
         repo.save(user);
         util.sendAnswer(chatId, reply);
 
@@ -74,17 +74,22 @@ public class Menu {
 
     void mainMenu(Update update, Long userId, Long chatId){
         log.info("User " + userId + " entered mainMenu state");
-        String reply = "Здравствуйте,\n" + repo.findById(userId)
-                .orElse(new BotUser((long)0, "Без имени")).getName() + "\nГлавное меню";
+        String reply = "Здравствуйте,\n" + repo.findById(userId).get().getName() + "\nГлавное меню:";
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-        rows.add(List.of(InlineKeyboardButton.builder().text("Список задач").callbackData("taskListNotFinished").build(),
-                        InlineKeyboardButton.builder().text("Добавить задачу").callbackData("taskAddMenu").build()));
-        rows.add(List.of(InlineKeyboardButton.builder().text("Изменить контактную информацию").callbackData("changeContactsMenu").build()));
+        List<List<InlineKeyboardButton>> buttonRows = new ArrayList<>();
+        buttonRows.add(List.of(
+                InlineKeyboardButton.builder().text("Список задач").callbackData("taskListNotFinished").build(),
+                InlineKeyboardButton.builder().text("Добавить задачу").callbackData("taskAddMenu").build()
+        ));
+        buttonRows.add(List.of(
+                InlineKeyboardButton.builder().text("Изменить контактную информацию").callbackData("changeContactsMenu").build()
+        ));
         if (util.isAdmin(userId))
-            rows.add(List.of(InlineKeyboardButton.builder().text("Пользователи").callbackData("userListAll").build()));
+            buttonRows.add(List.of(
+                    InlineKeyboardButton.builder().text("Пользователи").callbackData("userListAll").build()
+            ));
 
-        markup.setKeyboard(rows);
+        markup.setKeyboard(buttonRows);
 
         util.setUserState(userId, chatId, "mainMenu");
         util.sendAnswer(update, chatId, reply, markup);
@@ -99,40 +104,51 @@ public class Menu {
     }
 
     void taskList(Update update, Long userId, Long chatId, boolean finished){
-        log.info("User " + userId + " entered taskList state");
-        List<Task> tasks = null;
+        log.info("User " + userId + " entered" + (finished ?" finished" : " active") + " taskList menu");
+        List<Task> tasks;
         if (util.isPerformer(userId)) {
-            tasks = taskRepo.findAllByFinished(finished);
             log.info("User get ALL tasks");
+            tasks = taskRepo.findAllByFinished(finished);
         } else {
-            tasks = taskRepo.findAllByCreatedByIdAndFinished(userId, finished);
             log.info("User get his tasks");
-        };
-        String reply = "";
+            tasks = taskRepo.findAllByCreatedByIdAndFinished(userId, finished);
+        }
+        String reply;
         if (tasks.isEmpty()) {
             reply = "Список " + (finished ? "завершённых" : "активных") + " задач пуст";
             util.setUserState(userId, "mainMenu");
         } else reply = "Список" + (finished ? " завершённых" : " активных") + " задач: ";
 
-        List<List<InlineKeyboardButton>> taskBtns = new ArrayList<>();
+        List<List<InlineKeyboardButton>> buttonRows = new ArrayList<>();
 
         for (Task t : tasks){
             String taskId = t.getId().toString();
-            taskBtns.add(List.of(InlineKeyboardButton.builder().text(
-                    taskId + ": " + Util.stripDate(t.getCreateDate()) + " - " + t.getDescription() + "\n").callbackData("taskDetails_" + taskId).build()));
-        };
+            buttonRows.add(List.of(
+                    InlineKeyboardButton.builder()
+                            .text(taskId + ": " + Util.stripDate(t.getCreateDate()) + " - " + t.getDescription() + "\n")
+                            .callbackData("taskDetails_" + taskId).build()
+            ));
+        }
         if (finished) {
-            taskBtns.add(List.of(InlineKeyboardButton.builder().text("Незавершённые").callbackData("taskListNotFinished").build(),
-                    InlineKeyboardButton.builder().text("Добавить задачу").callbackData("taskAddMenu").build()));
-            taskBtns.add(List.of(InlineKeyboardButton.builder().text("Очистить завершённые").callbackData("taskDeleteAllFinished").build()));
+            buttonRows.add(List.of(
+                    InlineKeyboardButton.builder().text("Незавершённые").callbackData("taskListNotFinished").build(),
+                    InlineKeyboardButton.builder().text("Добавить задачу").callbackData("taskAddMenu").build()
+            ));
+            buttonRows.add(List.of(
+                    InlineKeyboardButton.builder().text("Очистить завершённые").callbackData("taskDeleteAllFinished").build()
+            ));
         } else {
-            taskBtns.add(List.of(InlineKeyboardButton.builder().text("Завершённые").callbackData("taskListFinished").build(),
-                    InlineKeyboardButton.builder().text("Добавить задачу").callbackData("taskAddMenu").build()));
-        };
+            buttonRows.add(List.of(
+                    InlineKeyboardButton.builder().text("Завершённые").callbackData("taskListFinished").build(),
+                    InlineKeyboardButton.builder().text("Добавить задачу").callbackData("taskAddMenu").build()
+            ));
+        }
 
-        taskBtns.add(List.of(InlineKeyboardButton.builder().text("Вернуться в главное меню").callbackData("mainMenu").build()));
+        buttonRows.add(List.of(
+                InlineKeyboardButton.builder().text("Вернуться в главное меню").callbackData("mainMenu").build()
+        ));
 
-        InlineKeyboardMarkup markup = InlineKeyboardMarkup.builder().keyboard(taskBtns).build();
+        InlineKeyboardMarkup markup = InlineKeyboardMarkup.builder().keyboard(buttonRows).build();
 
         util.sendAnswer(update, chatId, reply, markup);
     }
@@ -149,35 +165,42 @@ public class Menu {
         String reply = "Задача добавлена";
         String task = update.getMessage().getText();
         taskRepo.save(new Task(task, repo.getById(userId)));
-        util.sendAnswer(chatId, reply);
         util.notifyPerformers("Для вас новая задача\n\"" + task
                 + "\"\n Добавлена " + repo.findById(userId).get().getName());
+        util.sendAnswer(chatId, reply);
         mainMenu(update, userId, chatId);
     }
 
     void taskDetails(Update update, Long userId, Long chatId){
         log.info("User " + userId + " entered taskDetails");
-        String reply = "Сведения о задаче ";
         Long taskId = Long.parseLong(update.getCallbackQuery().getData().split("_")[1]);
+        String reply = "Сведения о задаче " + taskId;
         Task task = taskRepo.findById(taskId).get();
         Boolean finished = task.getFinished();
-        reply += taskId.toString() + "\n" +
+        reply += taskId + "\n" +
                 "Дата создания: " + task.getCreateDate() + "\n" +
                 "Описание: " + task.getDescription() + "\n" +
 //                "Завершить до: " + task.getMaxDate() + "\n" +
                 "Завершена: " + (task.getFinishDate() == null? "Нет" : task.getFinishDate()) + "\n" +
                 "Создал: " + task.getCreatedBy().getName();
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> keyboardRows = new ArrayList<>();
-        keyboardRows.add(List.of(InlineKeyboardButton.builder().text(finished ? "Возобновить" : "Выполнена")
+        List<List<InlineKeyboardButton>> buttonRows = new ArrayList<>();
+        buttonRows.add(List.of(
+                InlineKeyboardButton.builder().text(finished ? "Возобновить" : "Выполнена")
                         .callbackData((finished ? "taskResume_" : "taskFinish_") + taskId).build(),
                 InlineKeyboardButton.builder().text("Удалить")
-                        .callbackData("taskDelete_" + taskId).build()));
-        if (finished) keyboardRows.add(List.of(InlineKeyboardButton.builder().text("Вернуться к завершённым")
-                .callbackData("taskListFinished").build()));
-        keyboardRows.add(List.of(InlineKeyboardButton.builder().text("Вернуться к списку задач")
-                .callbackData("taskListNotFinished").build()));
-        markup.setKeyboard(keyboardRows); util.sendAnswer(update, chatId, reply, markup);
+                        .callbackData("taskDelete_" + taskId).build()
+        ));
+        if (finished) buttonRows.add(List.of(
+                InlineKeyboardButton.builder().text("Вернуться к завершённым")
+                .callbackData("taskListFinished").build()
+        ));
+        buttonRows.add(List.of(
+                InlineKeyboardButton.builder().text("Вернуться к списку задач")
+                .callbackData("taskListNotFinished").build()
+        ));
+        markup.setKeyboard(buttonRows);
+        util.sendAnswer(update, chatId, reply, markup);
     }
 
     void taskDelete(Update update, Long userId, Long chatId){
@@ -229,7 +252,6 @@ public class Menu {
         userList(update, userId, chatId, repo.findAll());
     }
 
-
     public void userListAdmins(Update update, Long userId, Long chatId){
         userList(update, userId, chatId, repo.findAllByAdmin(true));
     }
@@ -241,29 +263,29 @@ public class Menu {
 
     public void userList(Update update, Long userId, Long chatId, List<BotUser> users){
         log.info("User " + userId + " entered userList state");
-        String reply = "Список пользователей (ваш id=" + userId + ")";
-        List<List<InlineKeyboardButton>> userBtns = new ArrayList<>();
+        String reply = "Список пользователей (ваш id = " + userId + ")";
+        List<List<InlineKeyboardButton>> buttonRows = new ArrayList<>();
 
         for (BotUser u : users){
             String uId = u.getId().toString();
-            userBtns.add(List.of(InlineKeyboardButton.builder().text(
+            buttonRows.add(List.of(InlineKeyboardButton.builder().text(
                     uId + ": " + u.getUserName()).callbackData("userDetails_" + uId).build()));
-        };
+        }
 
         if (users.isEmpty()) {
             reply = "Список пользователей пуст";
         }
 
-        userBtns.add(List.of(InlineKeyboardButton.builder().text("Админы")
+        buttonRows.add(List.of(InlineKeyboardButton.builder().text("Админы")
                         .callbackData("userListAdmins").build(),
                 InlineKeyboardButton.builder().text("Исполнители")
                         .callbackData("userListPerformers").build(),
                 InlineKeyboardButton.builder().text("Все")
                         .callbackData("userListAll").build()));
-        userBtns.add(List.of(InlineKeyboardButton.builder().text("Создать инвайт").callbackData("newInvite").build()));
-        userBtns.add(List.of(InlineKeyboardButton.builder().text("Вернуться в главное меню").callbackData("mainMenu").build()));
+        buttonRows.add(List.of(InlineKeyboardButton.builder().text("Создать инвайт").callbackData("newInvite").build()));
+        buttonRows.add(List.of(InlineKeyboardButton.builder().text("Вернуться в главное меню").callbackData("mainMenu").build()));
 
-        InlineKeyboardMarkup markup = InlineKeyboardMarkup.builder().keyboard(userBtns).build();
+        InlineKeyboardMarkup markup = InlineKeyboardMarkup.builder().keyboard(buttonRows).build();
         util.sendAnswer(update, chatId, reply, markup);
     }
 
@@ -275,7 +297,7 @@ public class Menu {
         Boolean performer = user.getPerformer();
         Boolean admin = user.getAdmin();
 
-        reply += uId.toString() + "\n" +
+        reply += uId + "\n" +
                 "userName: " + user.getUserName() + "\n" +
                 "firstName: " + user.getFirstName() + "\n" +
                 "lastName: " + user.getLastName() + "\n" +
@@ -284,16 +306,20 @@ public class Menu {
                 "Администратор: " + (admin?"Да":"Нет") + "\n" +
                 "Статус: " + user.getState();
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> keyboardRows = new ArrayList<>();
-        keyboardRows.add(List.of(InlineKeyboardButton.builder().text(performer? "Не исполнитель" : "Исполнитель")
+        List<List<InlineKeyboardButton>> buttonRows = new ArrayList<>();
+        buttonRows.add(List.of(
+                InlineKeyboardButton.builder().text(performer? "Не исполнитель" : "Исполнитель")
                         .callbackData((performer ? "userUnSetPerformer_" : "userSetPerformer_") + uId).build(),
                 InlineKeyboardButton.builder().text(admin? "Не админ" : "Админ")
                         .callbackData((admin? "userUnSetAdmin_" : "userSetAdmin_") + uId).build(),
                 InlineKeyboardButton.builder().text("Удалить")
-                        .callbackData("userDelete_" + uId).build()));
-                keyboardRows.add(List.of(InlineKeyboardButton.builder().text("Вернуться к списку пользователей")
-                .callbackData("userListAll").build()));
-        markup.setKeyboard(keyboardRows);
+                        .callbackData("userDelete_" + uId).build()
+        ));
+        buttonRows.add(List.of(
+                InlineKeyboardButton.builder().text("Вернуться к списку пользователей")
+                .callbackData("userListAll").build()
+        ));
+        markup.setKeyboard(buttonRows);
         util.sendAnswer(update, chatId, reply, markup);
     }
 
@@ -342,7 +368,7 @@ public class Menu {
     }
 
     void newInvite(Update update, Long userId, Long chatId){
-        log.info("User " + userId + " entered createInvite");
+        log.info("User " + userId + " entered newInvite");
         util.deleteMessage(update.getCallbackQuery().getMessage().getMessageId(), chatId);
         util.sendAnswer(chatId, util.createInvite());
         userListAll(null, userId, chatId);
