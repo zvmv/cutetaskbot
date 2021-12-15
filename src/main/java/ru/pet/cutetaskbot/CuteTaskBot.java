@@ -33,9 +33,8 @@ public class CuteTaskBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        String methodToInvoke = null;
-        Long userId = null;
-        Long chatId = null;
+        String methodToInvoke;
+        Long userId, chatId;
         if (update.hasMessage() && update.getMessage().hasText()) {
             userId = update.getMessage().getFrom().getId();
             log.info("Received message from " + userId);
