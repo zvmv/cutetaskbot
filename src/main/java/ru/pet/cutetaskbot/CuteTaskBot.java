@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import ru.pet.cutetaskbot.repository.BotUserRepository;
@@ -22,8 +21,6 @@ public class CuteTaskBot extends TelegramLongPollingBot {
     @Value("${bot.token}")
     private String BOT_TOKEN;
 
-    private final BotUserRepository repo;
-
     @Autowired
     private Menu menuInstance;
 
@@ -31,44 +28,35 @@ public class CuteTaskBot extends TelegramLongPollingBot {
     private Util util;
 
     @Autowired
-    public CuteTaskBot(BotUserRepository repo) {
-        this.repo = repo;
+    public CuteTaskBot() {
         log.info("TaskBot started...");
     }
 
     @Override
     public void onUpdateReceived(Update update) {
+        String methodToInvoke = null;
+        Long userId = null;
+        Long chatId = null;
         if (update.hasMessage() && update.getMessage().hasText()) {
-            Long userId = update.getMessage().getFrom().getId();
+            userId = update.getMessage().getFrom().getId();
             log.info("Received message from " + userId);
-            Message msg = update.getMessage();
-
-            String userState = util.getUserState(userId);
-
-            try {
-                log.info("Try to invoke method " + userState);
-                Method method = Menu.class.getDeclaredMethod(userState, Update.class, Long.class, Long.class);
-                method.invoke(menuInstance, update, userId, msg.getChatId());
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                log.error(e.toString());
-                if (e.getCause() != null) log.error(e.getCause().toString());
-            }
+            chatId  = update.getMessage().getChatId();
+            methodToInvoke = util.getUserState(userId);
         } else if (update.hasCallbackQuery()) {
-            String callback = update.getCallbackQuery().getData().split("_")[0];
-            Long userId = update.getCallbackQuery().getFrom().getId();
+            userId = update.getCallbackQuery().getFrom().getId();
             log.info("Received query from " + userId);
-            String userState = util.getUserState(userId);
-            Message message = update.getCallbackQuery().getMessage();
-
-            try {
-                log.info("Try to invoke method " + userState);
-                Method method = Menu.class.getDeclaredMethod(callback, Update.class, Long.class, Long.class);
-                method.invoke(menuInstance, update, userId, message.getChatId());
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                log.error(e.toString());
-                if (e.getCause() != null) log.error(e.getCause().toString());
-            }
-
+            chatId = update.getCallbackQuery().getMessage().getChatId();
+            methodToInvoke = update.getCallbackQuery().getData().split("_")[0];
+        } else {
+            log.info("Update has message that not processed");
+        }
+        try {
+            log.info("Try to invoke method " + methodToInvoke);
+            Method method = Menu.class.getDeclaredMethod(methodToInvoke, Update.class, Long.class, Long.class);
+            method.invoke(menuInstance, update, userId, chatId);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            log.error(e.toString());
+            if (e.getCause() != null) log.error(e.getCause().toString());
         }
     }
 
