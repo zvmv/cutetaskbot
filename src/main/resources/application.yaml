@@ -2,6 +2,7 @@ bot:
   name: ${BOT_NAME}
   token: ${BOT_TOKEN}
   admin_id: ${BOT_ADMIN_ID}
+  invite_expire_days: 7
 
 base:
   url: ${DATABASE_URL}

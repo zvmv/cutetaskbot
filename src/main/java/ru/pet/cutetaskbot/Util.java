@@ -26,6 +26,7 @@ public class Util {
 
     private final Map<Integer, LocalDate> invites = new HashMap<>();
 
+    @Value("${bot.invite_expire_days}")
     private final int INVITE_EXPIRE_DAYS = 7;
 
     private final BotUserRepository repo;
