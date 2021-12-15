@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ru.pet</groupId>
     <artifactId>CuteTaskBot</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.5-SNAPSHOT</version>
     <name>CuteTaskBot</name>
     <description>Telegram bot for creating tasks</description>
     <parent>
