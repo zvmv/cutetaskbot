@@ -17,7 +17,6 @@ import ru.pet.cutetaskbot.repository.BotUserRepository;
 
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -25,7 +24,7 @@ public class Util {
     @Value("${bot.admin_id}")
     public Long ADMIN_ID;
 
-    private Map<Integer, LocalDate> invites = new HashMap<>();
+    private final Map<Integer, LocalDate> invites = new HashMap<>();
 
     private final int INVITE_EXPIRE_DAYS = 7;
 
@@ -41,18 +40,14 @@ public class Util {
         this.repo = repo;
     }
 
-    public Boolean isPerformer(Long userId){
+    public boolean isPerformer(Long userId){
         BotUser user = repo.findById(userId).orElse(null);
         return user != null && user.getPerformer();
     }
 
-    public Boolean isAdmin(Long userId){
+    public boolean isAdmin(Long userId){
         BotUser user = repo.findById(userId).orElse(null);
         return user != null && user.getAdmin();
-    }
-
-    public List<BotUser> getPerformers(){
-        return repo.findAllByPerformer(true);
     }
 
     public String getUserState(Long userId){
@@ -69,13 +64,14 @@ public class Util {
 
     public void setUserState(Long userId, Long chatId, String state){
         BotUser user = repo.findById(userId).orElse(new BotUser());
-        if (user.getId() == null) log.debug("User " + userId + " not found");
-        user.setId(userId);
+        if (user.getId() == null) {
+            log.debug("Adding user " + userId);
+            user.setId(userId);
+        }
         if (chatId != null) user.setChatId(chatId);
         user.setState(state);
         repo.save(user);
     }
-
 
     public void sendAnswer(Long chatId, String text) {
         sendAnswer(chatId, text, null);
@@ -163,25 +159,10 @@ public class Util {
             if (date.getDayOfWeek().getValue() <= now.getDayOfWeek().getValue()) {
                 return weekDay[date.getDayOfWeek().getValue()];
             }
-        String result = "";
-        result += date.getDayOfMonth() + "." + date.getMonthValue();
+
+        String result = date.getDayOfMonth() + "." + date.getMonthValue();
         if (now.getYear() != date.getYear())
             result += "." + date.getYear();
         return result;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(stripDate(LocalDate.now()));
-        System.out.println(stripDate(LocalDate.parse("2021-12-04")));
-        System.out.println(stripDate(LocalDate.parse("2021-12-03")));
-        System.out.println(stripDate(LocalDate.parse("2021-12-02")));
-        System.out.println(stripDate(LocalDate.parse("2021-11-30")));
-        System.out.println(stripDate(LocalDate.parse("2021-11-29")));
-        System.out.println(stripDate(LocalDate.parse("2021-11-28")));
-        System.out.println(stripDate(LocalDate.parse("2021-12-06")));
-        System.out.println(stripDate(LocalDate.parse("2021-12-07")));
-        System.out.println(stripDate(LocalDate.parse("2020-12-07")));
-
-
     }
 }
