@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import ru.pet.cutetaskbot.repository.BotUserRepository;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -48,7 +47,8 @@ public class CuteTaskBot extends TelegramLongPollingBot {
             chatId = update.getCallbackQuery().getMessage().getChatId();
             methodToInvoke = update.getCallbackQuery().getData().split("_")[0];
         } else {
-            log.info("Update has message that not processed");
+            log.info("Update has message that could not be processed");
+            return;
         }
         try {
             log.info("Try to invoke method " + methodToInvoke);
