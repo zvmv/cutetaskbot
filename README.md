@@ -4,7 +4,7 @@ Lightweight task bot for Telegram on Java
 ## Installing
 Create your new Telegram bot through BotFather
 
-Deploy cutetaskbot (for example to Heroku) amd create db (resources/initDb.sql)
+Deploy cutetaskbot (for example to Heroku) and create db (resources/initDb.sql)
 
 Set environment variables:  
 `BOT_NAME = <your bot name>`  
