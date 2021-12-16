@@ -35,7 +35,7 @@ public class Menu {
 
     void notAuthorized(Update update, Long userId, Long chatId){
         log.info("User " + userId + " entered notAuthorized");
-        util.sendAnswer(chatId, "Для использования сервиса нужно получить приглашение");
+        util.sendAnswer(chatId, "Для использования сервиса нужно получить приглашение. Ваш userId = " + userId);
     }
 
     void userNotFound(Update update, Long userId, Long chatId){
