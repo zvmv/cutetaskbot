@@ -10,7 +10,7 @@ Set environment variables:
 `BOT_NAME = <your bot name>`  
 `BOT_TOKEN = <bot token>`  
 `BOT_ADMIN_ID = <your Telegram userId>`   
-You can get userId in start message when first time starts the bot 
+You can get userId in start message when first time starts the bot  
 `DATABASE_URL = <url to you postgres DB with user and pass. Starts with postgresql://>`  
 
 Enjoy!
