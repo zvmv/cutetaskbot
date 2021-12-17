@@ -16,7 +16,7 @@ You can get userId in start message when first time starts the bot
 Enjoy!
 
 ## Features:
-You can add users by sending them invites.
-Make some users task performers
-New tasks are visible to all performers
-Notification will be send to user, that created task, when his task will be completed
+- You can add users by sending them invites.
+- Make some users task performers
+- New tasks are visible to all performers
+- Notification will be send to the user, who created the task, when his task is completed
