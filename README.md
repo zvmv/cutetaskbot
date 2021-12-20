@@ -1,22 +1,51 @@
 # cutetaskbot
-Lightweight task bot for Telegram on Java
+Простой бот для Telegram для создания задач для исполнителя.
 
-## Installing
-Create your new Telegram bot through BotFather
+## Установка
+Создайте своего бота Telegram через бота @BotFather. Вам понадибится имя бота и его токен.
 
-Deploy cutetaskbot (for example to Heroku) and create db (resources/initDb.sql)
+- Скачайте дистрибутив cutetaskbot и соберите бота:  
 
-Set environment variables:  
-`BOT_NAME = <your bot name>`  
-`BOT_TOKEN = <bot token>`  
-`BOT_ADMIN_ID = <your Telegram userId>`   
-You can get userId in start message when first time starts the bot  
-`DATABASE_URL = <url to you postgres DB with user and pass. Starts with postgresql://>`  
+      $ git clone http://github.com/zvmv/cutetaskbot
 
-Enjoy!
+- Зарегистрируйтесь на http://heroku.com
+- Устанвалием приложение heroku:
+  
+      $ curl https://cli-assets.heroku.com/install.sh | sh
+- В папке с ботом выполняем  
+  
+      $ heroku login
+- Откроется браузер, где надо залогиниться на heroku своими данными
+- Создаём приложение heroku
+  
+      $ heroku create <имя приложения>
+- Устанавливаем аддон базы данных
+  
+      $ heroku addons:create heroku-postgresql:hobby-dev
+- Инициализируем базу данных (должна быть установленна клиентская часть postgresql)
 
-## Features:
-- You can add users by sending them invites.
-- Make some users task performers
-- New tasks are visible to all performers
-- Notification will be send to the user, who created the task, when his task is completed
+      $ cat src/main/resources/initDb.sql | heroku cmd:psql
+- Устанавливаем имя и токен бота:
+  
+      $ heroku config:set BOT_NAME=<имя_бота>  
+      $ heroku config:set BOT_TOKEN=<токен_бота>  
+      $ heroku config:set BOT_ADMIN_ID=0
+- Загружаем и запускаем нашего бота
+  
+      $ git push heroku master
+      $ heroku ps:scale worker=1
+
+- Находим по имени бота в Telegram. В первом сообщении узнаём свой userID.
+- Устанавлиаем переменную окружения администратора
+
+      $ heroku config:set BOT_ADMIN_ID=<ID вашего пользователя>
+      $ heroku ps:scale worker=0
+      $ heroku ps:scale worker=1
+     
+- Наслаждаемся!
+
+## Возможности:
+- Добавить пользователя, прислав ему инвайт
+- Назначьте пользователя исполнителем
+- Все новые задачи от всех пользователей будут ему видны и будут приходит оповещения о создании
+- После выполнения им задачи постановщику отсылается оповещение
